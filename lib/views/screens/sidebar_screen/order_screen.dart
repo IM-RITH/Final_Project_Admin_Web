@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class OrderScreen extends StatelessWidget {
   const OrderScreen({super.key});
-  static const String routeName = "OrderScreen";
+  static const String routeName = "/OrderScreen";
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(

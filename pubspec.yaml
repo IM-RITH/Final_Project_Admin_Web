@@ -39,6 +39,7 @@ dependencies:
   cloud_firestore: ^4.15.10
   flutter_admin_scaffold: ^1.2.0
   google_fonts: ^6.2.1
+  image_picker: ^1.0.7
 
 dev_dependencies:
   flutter_test:

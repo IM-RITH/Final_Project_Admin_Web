@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class CustomerScreen extends StatelessWidget {
   const CustomerScreen({super.key});
-  static const String routeName = "CustomerScreen";
+  static const String routeName = "/CustomerScreen";
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
