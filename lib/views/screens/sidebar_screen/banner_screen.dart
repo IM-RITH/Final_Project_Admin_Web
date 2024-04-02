@@ -19,7 +19,7 @@ class _BannerScreenState extends State<BannerScreen> {
   String? fileName;
   bool _isLoading = false;
 
-  Future<void> pickImage() async {
+  Future<void> _pickImage() async {
     FilePickerResult? result = await FilePicker.platform
         .pickFiles(allowMultiple: false, type: FileType.image);
     if (result != null) {
@@ -148,7 +148,7 @@ class _BannerScreenState extends State<BannerScreen> {
                   children: [
                     ElevatedButton.icon(
                       onPressed: () {
-                        pickImage();
+                        _pickImage();
                       },
                       icon: const Icon(Icons.cloud_upload, size: 18),
                       label: Text('Upload', style: buttonText),
