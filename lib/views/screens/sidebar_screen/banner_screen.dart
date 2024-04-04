@@ -1,3 +1,4 @@
+import 'package:admin_easyshop/views/screens/sidebar_screen/widgets/banner_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -180,26 +181,7 @@ class _BannerScreenState extends State<BannerScreen> {
             ),
           ),
           const Divider(color: Colors.grey),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 150,
-                  width: 400,
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(color: Colors.cyan),
-                  ),
-                  child: const Center(
-                    child: Text("Image"),
-                  ),
-                ),
-              ],
-            ),
-          )
+          const BannerWidget()
         ],
       ),
     );
