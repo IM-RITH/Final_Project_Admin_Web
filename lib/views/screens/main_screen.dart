@@ -29,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
     const VendorScreen(),
     const CustomerScreen(),
     const BannerScreen(),
-    const OrderScreen(),
+    OrderScreen(),
     const WithdrawScreen()
   ];
 
