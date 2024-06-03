@@ -3,7 +3,6 @@ import 'package:admin_easyshop/views/screens/sidebar_screen/category_screen.dart
 import 'package:admin_easyshop/views/screens/sidebar_screen/customer_screen.dart';
 import 'package:admin_easyshop/views/screens/sidebar_screen/order_screen.dart';
 import 'package:admin_easyshop/views/screens/sidebar_screen/product_screen.dart';
-import 'package:admin_easyshop/views/screens/sidebar_screen/withdraw_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_scaffold/admin_scaffold.dart';
 import 'package:admin_easyshop/views/screens/sidebar_screen/dashboard_screen.dart';
@@ -30,7 +29,6 @@ class _MainScreenState extends State<MainScreen> {
     const CustomerScreen(),
     const BannerScreen(),
     OrderScreen(),
-    const WithdrawScreen()
   ];
 
   // Function to change index
@@ -92,11 +90,6 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icons.list,
             route: '/orders',
           ),
-          AdminMenuItem(
-            title: 'Withdrawal',
-            icon: Icons.currency_exchange,
-            route: '/withdrawal',
-          ),
         ],
         selectedRoute: '/',
         onSelected: (item) {
@@ -113,10 +106,8 @@ class _MainScreenState extends State<MainScreen> {
             _changeScreen(4);
           } else if (item.route == '/banners') {
             _changeScreen(5);
-          } else if (item.route == '/orders') {
-            _changeScreen(6);
           } else {
-            _changeScreen(7);
+            _changeScreen(6);
           }
         },
         header: Container(
@@ -134,8 +125,11 @@ class _MainScreenState extends State<MainScreen> {
           height: 50,
           child: Center(
             child: Text(
-              'Logout',
-              style: TextStyle(color: Theme.of(context).primaryColor),
+              'Easy Shop',
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontSize: 15,
+              ),
             ),
           ),
         ),

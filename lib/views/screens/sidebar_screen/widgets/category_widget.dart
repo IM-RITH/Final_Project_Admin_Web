@@ -6,10 +6,10 @@ class CategoryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Stream<QuerySnapshot> _categoriesStream =
+    final Stream<QuerySnapshot> categoriesStream =
         FirebaseFirestore.instance.collection('categories').snapshots();
     return StreamBuilder<QuerySnapshot>(
-      stream: _categoriesStream,
+      stream: categoriesStream,
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return const Text('Something went wrong');

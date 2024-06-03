@@ -81,7 +81,7 @@ class _BannerScreenState extends State<BannerScreen> {
   Widget build(BuildContext context) {
     TextStyle bannerText = GoogleFonts.roboto(
       fontSize: 20,
-      color: Colors.white,
+      color: Colors.blueGrey,
       fontWeight: FontWeight.w600,
     );
 
@@ -90,99 +90,102 @@ class _BannerScreenState extends State<BannerScreen> {
       minimumSize: const Size(120, 40),
       padding: const EdgeInsets.symmetric(horizontal: 5),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(10),
       ),
+      backgroundColor: Colors.deepPurple,
+      foregroundColor: Colors.white,
     );
     TextStyle buttonText = GoogleFonts.roboto(
       fontSize: 14,
       fontWeight: FontWeight.w600,
     );
 
-    TextStyle sectionTitle = const TextStyle(
+    TextStyle sectionTitle = GoogleFonts.roboto(
       fontSize: 36,
-      fontWeight: FontWeight.w700,
+      fontWeight: FontWeight.w600,
+      color: Colors.blueGrey,
     );
 
     return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            alignment: Alignment.topLeft,
-            padding: const EdgeInsets.all(10),
-            child: const Text(
+      child: Container(
+        color: Colors.white,
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
               'Manage Banners',
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 36,
-              ),
-            ),
-          ),
-          const Divider(color: Colors.grey),
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 150,
-                  width: 400,
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(color: Colors.cyan),
-                  ),
-                  child: _image != null
-                      ? Image.memory(
-                          _image,
-                          fit: BoxFit.cover,
-                        )
-                      : Center(
-                          child: Text(
-                            "Banners",
-                            style: bannerText,
-                          ),
-                        ),
-                ),
-                const SizedBox(width: 20),
-                Column(
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        _pickImage();
-                      },
-                      icon: const Icon(Icons.cloud_upload, size: 18),
-                      label: Text('Upload', style: buttonText),
-                      style: buttonStyle,
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton.icon(
-                      onPressed: _isLoading ? null : addImageToFirebaseStore,
-                      icon: _isLoading
-                          ? const CircularProgressIndicator(
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white))
-                          : const Icon(Icons.save, size: 18),
-                      label: Text(_isLoading ? 'In Progress...' : 'Save',
-                          style: buttonText),
-                      style: buttonStyle,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 30),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text(
-              "Banners",
               style: sectionTitle,
             ),
-          ),
-          const Divider(color: Colors.grey),
-          const BannerWidget()
-        ],
+            const Divider(color: Colors.grey),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 150,
+                    width: 400,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.blueGrey),
+                    ),
+                    child: _image != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.memory(
+                              _image,
+                              fit: BoxFit.contain,
+                            ),
+                          )
+                        : Center(
+                            child: Text(
+                              "Banners",
+                              style: bannerText,
+                            ),
+                          ),
+                  ),
+                  const SizedBox(width: 20),
+                  Column(
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          _pickImage();
+                        },
+                        icon: const Icon(Icons.cloud_upload, size: 18),
+                        label: Text('Upload', style: buttonText),
+                        style: buttonStyle,
+                      ),
+                      const SizedBox(height: 10),
+                      ElevatedButton.icon(
+                        onPressed: _isLoading ? null : addImageToFirebaseStore,
+                        icon: _isLoading
+                            ? const CircularProgressIndicator(
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white))
+                            : const Icon(Icons.save, size: 18),
+                        label: Text(_isLoading ? 'In Progress...' : 'Save',
+                            style: buttonText),
+                        style: buttonStyle,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 30),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Text(
+                "Banners",
+                style: sectionTitle,
+              ),
+            ),
+            const Divider(color: Colors.grey),
+            const BannerWidget()
+          ],
+        ),
       ),
     );
   }

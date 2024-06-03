@@ -21,6 +21,39 @@ class _CustomerScreenState extends State<CustomerScreen> {
     super.dispose();
   }
 
+  void _deleteCustomer(String customerId) async {
+    final bool? confirm = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Deletion'),
+        content: const Text('Are you sure you want to delete this customer?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await _firestore.collection('buyers').doc(customerId).delete();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Customer deleted successfully')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting customer: $e')),
+        );
+      }
+    }
+  }
+
   Widget _buildRow(String text, IconData icon, int flex,
       {Color? backgroundColor}) {
     return Expanded(
@@ -66,6 +99,21 @@ class _CustomerScreenState extends State<CustomerScreen> {
       ),
       child: Row(
         children: [
+          Expanded(
+            flex: 1,
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                child: IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () {
+                    _deleteCustomer(buyer.id);
+                  },
+                  tooltip: 'Delete',
+                ),
+              ),
+            ),
+          ),
           Expanded(
             flex: 2,
             child: Container(
@@ -184,6 +232,12 @@ class _CustomerScreenState extends State<CustomerScreen> {
             Row(
               children: [
                 _buildRow(
+                  'Action',
+                  Icons.email,
+                  1,
+                  backgroundColor: Colors.blueGrey.shade50,
+                ),
+                _buildRow(
                   'ID',
                   Icons.account_circle,
                   2,
@@ -229,8 +283,6 @@ class _CustomerScreenState extends State<CustomerScreen> {
                 return Column(
                   children: filteredDocs.map((doc) {
                     return GestureDetector(
-                      // onTap: () => _showBuyerDetails(
-                      //     doc.data() as Map<String, dynamic>?),
                       child: _buildBuyerRow(doc),
                     );
                   }).toList(),

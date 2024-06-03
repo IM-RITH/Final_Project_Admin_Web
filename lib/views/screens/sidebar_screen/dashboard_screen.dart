@@ -30,95 +30,112 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _fetchDashboardData() async {
-    // Fetch data for buyers
-    final buyersSnapshot = await _firestore.collection('buyers').get();
-    final previousWeekBuyersSnapshot = await _firestore
-        .collection('buyers')
-        .where('created_at',
-            isGreaterThanOrEqualTo: DateTime.now().subtract(Duration(days: 14)))
-        .where('created_at',
-            isLessThan: DateTime.now().subtract(Duration(days: 7)))
-        .get();
-    final currentWeekBuyersSnapshot = await _firestore
-        .collection('buyers')
-        .where('created_at',
-            isGreaterThanOrEqualTo: DateTime.now().subtract(Duration(days: 7)))
-        .get();
+    try {
+      // Fetch data for buyers
+      final buyersSnapshot = await _firestore.collection('buyers').get();
+      final previousWeekBuyersSnapshot = await _firestore
+          .collection('buyers')
+          .where('created_at',
+              isGreaterThanOrEqualTo:
+                  DateTime.now().subtract(const Duration(days: 14)))
+          .where('created_at',
+              isLessThan: DateTime.now().subtract(const Duration(days: 7)))
+          .get();
+      final currentWeekBuyersSnapshot = await _firestore
+          .collection('buyers')
+          .where('created_at',
+              isGreaterThanOrEqualTo:
+                  DateTime.now().subtract(const Duration(days: 7)))
+          .get();
 
-    // Fetch data for vendors
-    final vendorsSnapshot = await _firestore.collection('vendors').get();
-    final previousWeekVendorsSnapshot = await _firestore
-        .collection('vendors')
-        .where('created_at',
-            isGreaterThanOrEqualTo: DateTime.now().subtract(Duration(days: 14)))
-        .where('created_at',
-            isLessThan: DateTime.now().subtract(Duration(days: 7)))
-        .get();
-    final currentWeekVendorsSnapshot = await _firestore
-        .collection('vendors')
-        .where('created_at',
-            isGreaterThanOrEqualTo: DateTime.now().subtract(Duration(days: 7)))
-        .get();
+      // Fetch data for vendors
+      final vendorsSnapshot = await _firestore.collection('vendors').get();
+      final previousWeekVendorsSnapshot = await _firestore
+          .collection('vendors')
+          .where('created_at',
+              isGreaterThanOrEqualTo:
+                  DateTime.now().subtract(const Duration(days: 14)))
+          .where('created_at',
+              isLessThan: DateTime.now().subtract(const Duration(days: 7)))
+          .get();
+      final currentWeekVendorsSnapshot = await _firestore
+          .collection('vendors')
+          .where('created_at',
+              isGreaterThanOrEqualTo:
+                  DateTime.now().subtract(const Duration(days: 7)))
+          .get();
 
-    // Fetch data for sales
-    final ordersSnapshot = await _firestore.collection('orders').get();
-    final previousWeekOrdersSnapshot = await _firestore
-        .collection('orders')
-        .where('date',
-            isGreaterThanOrEqualTo: DateTime.now().subtract(Duration(days: 14)))
-        .where('date', isLessThan: DateTime.now().subtract(Duration(days: 7)))
-        .get();
-    final currentWeekOrdersSnapshot = await _firestore
-        .collection('orders')
-        .where('date',
-            isGreaterThanOrEqualTo: DateTime.now().subtract(Duration(days: 7)))
-        .get();
+      // Fetch data for sales
+      final ordersSnapshot = await _firestore.collection('orders').get();
+      final previousWeekOrdersSnapshot = await _firestore
+          .collection('orders')
+          .where('date',
+              isGreaterThanOrEqualTo:
+                  DateTime.now().subtract(const Duration(days: 14)))
+          .where('date',
+              isLessThan: DateTime.now().subtract(const Duration(days: 7)))
+          .get();
+      final currentWeekOrdersSnapshot = await _firestore
+          .collection('orders')
+          .where('date',
+              isGreaterThanOrEqualTo:
+                  DateTime.now().subtract(const Duration(days: 7)))
+          .get();
 
-    double totalSales = 0.0;
-    Map<String, double> salesByDay = {};
+      double totalSales = 0.0;
+      Map<String, double> salesByDay = {};
 
-    for (var doc in ordersSnapshot.docs) {
-      final data = doc.data();
-      final double totalPrice = data['totalPrice']?.toDouble() ?? 0.0;
-      totalSales += totalPrice;
+      for (var doc in ordersSnapshot.docs) {
+        final data = doc.data();
+        final double totalPrice = data['totalPrice']?.toDouble() ?? 0.0;
+        totalSales += totalPrice;
 
-      // Parse the date and extract the day
-      Timestamp dateTimestamp = data['date'];
-      DateTime date = dateTimestamp.toDate();
-      String day = DateFormat.yMMMd().format(date);
+        // Parse the date and extract the day
+        Timestamp dateTimestamp = data['date'];
+        DateTime date = dateTimestamp.toDate();
+        String day = DateFormat.yMMMd().format(date);
 
-      if (salesByDay.containsKey(day)) {
-        salesByDay[day] = salesByDay[day]! + totalPrice;
-      } else {
-        salesByDay[day] = totalPrice;
+        if (salesByDay.containsKey(day)) {
+          salesByDay[day] = salesByDay[day]! + totalPrice;
+        } else {
+          salesByDay[day] = totalPrice;
+        }
       }
-    }
 
-    double previousWeekSales = 0.0;
-    for (var doc in previousWeekOrdersSnapshot.docs) {
-      final data = doc.data();
-      final double totalPrice = data['totalPrice']?.toDouble() ?? 0.0;
-      previousWeekSales += totalPrice;
-    }
+      double previousWeekSales = 0.0;
+      for (var doc in previousWeekOrdersSnapshot.docs) {
+        final data = doc.data();
+        final double totalPrice = data['totalPrice']?.toDouble() ?? 0.0;
+        previousWeekSales += totalPrice;
+      }
 
-    setState(() {
-      _totalBuyers = buyersSnapshot.docs.length;
-      _totalVendors = vendorsSnapshot.docs.length;
-      _totalSales = totalSales;
-      _previousWeekSales = previousWeekSales;
-      _salesData = salesByDay.entries
-          .map((entry) => SalesData(entry.key, entry.value))
-          .toList();
-      _buyerChange = (currentWeekBuyersSnapshot.docs.length -
-              previousWeekBuyersSnapshot.docs.length) /
-          previousWeekBuyersSnapshot.docs.length *
-          100;
-      _vendorChange = (currentWeekVendorsSnapshot.docs.length -
-              previousWeekVendorsSnapshot.docs.length) /
-          previousWeekVendorsSnapshot.docs.length *
-          100;
-      _salesChange = (totalSales - previousWeekSales) / previousWeekSales * 100;
-    });
+      setState(() {
+        _totalBuyers = buyersSnapshot.docs.length;
+        _totalVendors = vendorsSnapshot.docs.length;
+        _totalSales = totalSales;
+        _previousWeekSales = previousWeekSales;
+        _salesData = salesByDay.entries
+            .map((entry) => SalesData(entry.key, entry.value))
+            .toList();
+        _buyerChange = previousWeekBuyersSnapshot.docs.isEmpty
+            ? 0
+            : (currentWeekBuyersSnapshot.docs.length -
+                    previousWeekBuyersSnapshot.docs.length) /
+                previousWeekBuyersSnapshot.docs.length *
+                100;
+        _vendorChange = previousWeekVendorsSnapshot.docs.isEmpty
+            ? 0
+            : (currentWeekVendorsSnapshot.docs.length -
+                    previousWeekVendorsSnapshot.docs.length) /
+                previousWeekVendorsSnapshot.docs.length *
+                100;
+        _salesChange = previousWeekSales == 0
+            ? 0
+            : (totalSales - previousWeekSales) / previousWeekSales * 100;
+      });
+    } catch (e) {
+      print("Error fetching dashboard data: $e");
+    }
   }
 
   @override
@@ -167,8 +184,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               SizedBox(
                 height: 300,
                 child: SfCartesianChart(
-                  primaryXAxis: CategoryAxis(),
-                  primaryYAxis: NumericAxis(
+                  primaryXAxis: const CategoryAxis(),
+                  primaryYAxis: const NumericAxis(
                     edgeLabelPlacement: EdgeLabelPlacement.shift,
                     labelFormat: '{value}',
                     title: AxisTitle(text: 'Sales'),
@@ -180,13 +197,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       xValueMapper: (SalesData sales, _) => sales.day,
                       yValueMapper: (SalesData sales, _) => sales.sales,
                       name: 'Sales',
-                      gradient: LinearGradient(
+                      gradient: const LinearGradient(
                         colors: <Color>[Colors.blue, Colors.lightBlueAccent],
                         stops: <double>[0.2, 0.9],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       ),
-                      dataLabelSettings: DataLabelSettings(
+                      dataLabelSettings: const DataLabelSettings(
                         isVisible: true,
                         textStyle: TextStyle(color: Colors.white),
                       ),
