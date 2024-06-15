@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class OrderScreen extends StatefulWidget {
@@ -130,30 +131,53 @@ class _OrderScreenState extends State<OrderScreen> {
             ),
           ),
           Expanded(
-            flex: 1,
-            child: Container(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  _showOrderDetails(data, context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  elevation: 5,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6),
+            flex: 2,
+            child: Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    _showOrderDetails(data, context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                ),
-                child: const Text(
-                  'View Details',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                  child: const Text(
+                    'View Details',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: () {
+                    _deleteOrder(order.id);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                  ),
+                  child: const Text(
+                    'Delete',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -178,48 +202,27 @@ class _OrderScreenState extends State<OrderScreen> {
           ),
           child: Container(
             padding: const EdgeInsets.all(20.0),
-            width: MediaQuery.of(context).size.width * 0.8,
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    data['productName'],
-                    style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blueAccent),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    '\$${data['totalPrice']}',
-                    style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildDetailRow('Buyer Name', data['buyerName']),
-                  const SizedBox(height: 10),
-                  _buildDetailRow('Buyer Email', data['buyerEmail']),
-                  const SizedBox(height: 10),
-                  _buildDetailRow('Phone', data['phone']),
-                  const SizedBox(height: 10),
-                  _buildDetailRow('Address', data['address']),
-                  const SizedBox(height: 10),
-                  _buildDetailRow('Payment Method', data['paymentMethod']),
-                  const SizedBox(height: 10),
-                  _buildDetailRow('Quantity', data['quantity'].toString()),
-                  const SizedBox(height: 10),
-                  _buildDetailRow('Shipping Fees', '\$${data['shippingFees']}'),
-                  const SizedBox(height: 10),
-                  _buildDetailRow('Date', formattedDate),
-                  const SizedBox(height: 10),
-                  _buildStatusRow('Accepted', data['accept']),
-                  const SizedBox(height: 10),
-                  _buildStatusRow('Delivered', data['delivered']),
-                ],
-              ),
+            width: MediaQuery.of(context).size.width * 0.6,
+            height: MediaQuery.of(context).size.height * 0.8,
+            child: GridView.count(
+              crossAxisCount: 3,
+              childAspectRatio: 3,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              children: [
+                _buildTextField('Product Name', data['productName']),
+                _buildTextField('Price', '\$${data['totalPrice']}'),
+                _buildTextField('Buyer Name', data['buyerName']),
+                _buildTextField('Buyer Email', data['buyerEmail']),
+                _buildTextField('Phone', data['phone']),
+                _buildTextField('Address', data['address']),
+                _buildTextField('Payment Method', data['paymentMethod']),
+                _buildTextField('Quantity', data['quantity'].toString()),
+                _buildTextField('Shipping Fees', '\$${data['shippingFees']}'),
+                _buildTextField('Date', formattedDate),
+                _buildStatusRow('Accepted', data['accept']),
+                _buildStatusRow('Delivered', data['delivered']),
+              ],
             ),
           ),
         );
@@ -227,25 +230,59 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
-  Widget _buildDetailRow(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '$title: ',
-            style: const TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+  void _deleteOrder(String orderId) async {
+    try {
+      await _firestore.collection('orders').doc(orderId).delete();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Order deleted successfully.'),
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 16, color: Colors.black87),
-            ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to delete order: $e'),
           ),
-        ],
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to delete order: $e'),
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _buildTextField(String label, String value) {
+    return TextField(
+      readOnly: true,
+      controller: TextEditingController(text: value),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.grey, fontSize: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: const BorderSide(color: Colors.blueAccent),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: const BorderSide(color: Colors.blueAccent),
+        ),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        suffixIcon: const Icon(
+          Icons.check_circle,
+          color: Colors.blueAccent,
+          size: 16,
+        ),
+        filled: true,
+        fillColor: Colors.white,
       ),
+      style: GoogleFonts.poppins(
+          fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
     );
   }
 
@@ -267,7 +304,7 @@ class _OrderScreenState extends State<OrderScreen> {
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
-              status ? 'Yes' : 'No',
+              status ? 'Done' : 'Not Yet',
               style: const TextStyle(fontSize: 16, color: Colors.white),
             ),
           ),
@@ -379,7 +416,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 _buildRow(
                   'Action',
                   Icons.more_vert,
-                  1,
+                  2,
                   backgroundColor: Colors.blueGrey.shade50,
                 ),
               ],

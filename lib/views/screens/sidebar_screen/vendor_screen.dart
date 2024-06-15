@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class VendorScreen extends StatefulWidget {
   const VendorScreen({super.key});
@@ -119,35 +120,62 @@ class _VendorScreenState extends State<VendorScreen> {
             ),
           ),
           Expanded(
-            flex: 1,
+            flex: 2,
             child: Container(
               padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: isApproved
-                    ? null
-                    : () {
-                        _firestore
-                            .collection('vendors')
-                            .doc(vendor.id)
-                            .update({'approved': true});
+              child: Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: isApproved
+                        ? null
+                        : () {
+                            _firestore
+                                .collection('vendors')
+                                .doc(vendor.id)
+                                .update({'approved': true});
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          isApproved ? const Color(0xFF141E46) : Colors.green,
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                    ),
+                    child: Text(
+                      isApproved ? 'Approved' : 'Approve',
+                      style: TextStyle(
+                        color: isApproved ? Colors.black : Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  if (isApproved) const SizedBox(width: 10),
+                  if (isApproved)
+                    ElevatedButton(
+                      onPressed: () {
+                        _showDeleteConfirmationDialog(vendor.id);
                       },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      isApproved ? const Color(0xFF141E46) : Colors.green,
-                  elevation: 5,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                ),
-                child: Text(
-                  isApproved ? 'Approved' : 'Approve',
-                  style: TextStyle(
-                    color: isApproved ? Colors.black : Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                      ),
+                      child: const Text(
+                        'Delete',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ),
@@ -156,9 +184,91 @@ class _VendorScreenState extends State<VendorScreen> {
     );
   }
 
+  void _showDeleteConfirmationDialog(String vendorId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          title: Row(
+            children: [
+              const Icon(Icons.warning, color: Colors.red),
+              const SizedBox(width: 10),
+              Text(
+                'Delete Vendor',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            'Are you sure you want to delete this vendor?',
+            style:
+                GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _deleteVendor(vendorId);
+                Navigator.of(context).pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              child: const Text(
+                'Delete',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteVendor(String vendorId) async {
+    try {
+      await _firestore.collection('vendors').doc(vendorId).delete();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Vendor deleted successfully')),
+        );
+      }
+    } catch (e) {
+      print('Error deleting vendor: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error deleting vendor')),
+        );
+      }
+    }
+  }
+
   void _searchVendor(String query) {
     setState(() {
-      _searchQuery = query.toLowerCase(); // Convert query to lowercase
+      _searchQuery = query.toLowerCase();
     });
   }
 
@@ -253,7 +363,7 @@ class _VendorScreenState extends State<VendorScreen> {
                 _buildRow(
                   'Action',
                   Icons.more_vert,
-                  1,
+                  2,
                   backgroundColor: Colors.blueGrey.shade50,
                 ),
               ],

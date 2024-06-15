@@ -161,14 +161,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildDashboardCard('Total Buyers', _totalBuyers.toString(),
-                      Colors.blue, _buyerChange),
+                      Colors.blue, _buyerChange, Icons.person),
                   _buildDashboardCard('Total Vendors', _totalVendors.toString(),
-                      Colors.green, _vendorChange),
+                      Colors.green, _vendorChange, Icons.store),
                   _buildDashboardCard(
                       'Total Sales',
                       '\$${_totalSales.toStringAsFixed(2)}',
                       Colors.red,
-                      _salesChange),
+                      _salesChange,
+                      Icons.attach_money),
                 ],
               ),
               const SizedBox(height: 20),
@@ -218,8 +219,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildDashboardCard(
-      String title, String value, Color color, double percentageChange) {
+  Widget _buildDashboardCard(String title, String value, Color color,
+      double percentageChange, IconData icon) {
     String changeText = percentageChange.isNaN
         ? "N/A"
         : percentageChange >= 0
@@ -230,29 +231,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Expanded(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 8.0),
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(10.0),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: const Color(0xFF22213B),
           borderRadius: BorderRadius.circular(10.0),
           border: Border.all(color: color),
         ),
         child: Column(
           children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: color,
-              ),
+            Row(
+              children: [
+                Icon(icon, size: 40, color: Colors.white),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 10),
             Text(
               value,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: color,
+                color: Colors.white,
               ),
             ),
             const SizedBox(height: 10),
